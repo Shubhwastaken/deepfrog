@@ -1,6 +1,48 @@
 {
   "country": "India",
-  "restricted_items": ["weapons", "narcotics"],
-  "required_documents": ["invoice", "packing_list", "bill_of_lading"],
-  "duty_rates": {"default": 0.10, "electronics": 0.18}
+  "applicable_rules": [
+    "IEC required for commercial importers under DGFT Importer Exporter Code requirements before filing a bill of entry."
+  ],
+  "hs_rules": [
+    {
+      "hs_prefix": "851712",
+      "description": "Mobile phones imported into India should be checked for BIS CRS coverage before domestic sale or distribution.",
+      "citation": "BIS Compulsory Registration Scheme for Electronics and IT Goods applies to regulated electronic goods including mobile handsets.",
+      "warning": "Verify BIS CRS registration details for the handset brand or manufacturer before import clearance."
+    },
+    {
+      "product_keywords": [
+        "food",
+        "beverage",
+        "edible",
+        "supplement"
+      ],
+      "description": "Food imports require FSSAI licensing and import-clearance checks.",
+      "citation": "Food Safety and Standards Act, 2006 and FSSAI import clearance requirements govern food imports into India.",
+      "warning": "Confirm FSSAI importer license, product approval status, and labeling review before shipment."
+    },
+    {
+      "product_keywords": [
+        "drug",
+        "medicine",
+        "pharma",
+        "pharmaceutical",
+        "medical device"
+      ],
+      "description": "Pharmaceutical and medical-device imports may require CDSCO registration or import licensing.",
+      "citation": "CDSCO import registration and licensing controls apply under the Drugs and Cosmetics regulatory framework.",
+      "warning": "Confirm CDSCO registration, import license, or NOC pathway before dispatch."
+    }
+  ],
+  "required_incoterms": [
+    "FOB",
+    "CIF",
+    "CFR"
+  ],
+  "default_warnings": [
+    "Validate labeling, packaging, and country-of-origin marking before filing."
+  ],
+  "notes": [
+    "BIS, IEC, FSSAI, and CDSCO obligations are product-dependent and should be evidenced in the customs clearance file."
+  ]
 }

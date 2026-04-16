@@ -21,15 +21,23 @@ docker-compose up --build
 
 ### Backend
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+pip install -r backend/requirements.txt
+uvicorn --app-dir backend app.main:app --reload
 ```
 
 ### Worker
 ```bash
 python -m workers.worker
 ```
+
+The worker is mandatory for local uploads now. The backend no longer runs jobs inline.
+
+### Two Local Workers
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_two_workers.ps1
+```
+
+This starts `worker-a` and `worker-b`, which both pull from the same Redis queue.
 
 ### Frontend
 ```bash

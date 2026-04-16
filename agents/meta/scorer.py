@@ -26,13 +26,20 @@ def calculate_scores(
             min_cost=min_cost,
             max_cost=max_cost,
         )
-        inverse_risk_score = max(0.0, min(1.0, 1.0 - bundle.debate_result.risk_score))
+        critic_result = bundle.critic_result or bundle.debate_result
+        inverse_risk_score = max(0.0, min(1.0, 1.0 - critic_result.risk_score))
+        confidence_score = max(0.0, min(1.0, bundle.world.confidence_score))
+        valuation_penalty = _valuation_penalty(bundle)
+        risk_flag_penalty = min(0.2, len(bundle.world.risk_flags) * 0.03)
         composite = (
             scoring_config.compliance_weight * compliance_score
             + scoring_config.cost_weight * inverse_duty_score
             + scoring_config.risk_weight * inverse_risk_score
+            + scoring_config.confidence_weight * confidence_score
+            - valuation_penalty
+            - risk_flag_penalty
         )
-        results[str(bundle.world.world_id)] = round(composite, 6)
+        results[str(bundle.world.world_id)] = round(max(0.0, composite), 6)
     return results
 
 
@@ -55,3 +62,21 @@ def _inverse_cost_score(cost: float, *, min_cost: float, max_cost: float) -> flo
     if max_cost == min_cost:
         return 1.0
     return max(0.0, min(1.0, 1.0 - ((cost - min_cost) / (max_cost - min_cost))))
+
+
+def _valuation_penalty(bundle: EvaluationBundle) -> float:
+    """Apply deterministic penalties for suspicious valuation outcomes."""
+
+    valuation = bundle.valuation_result
+    if valuation is None:
+        return 0.0
+
+    severity_penalties = {
+        "none": 0.0,
+        "low": 0.02,
+        "medium": 0.08,
+        "high": 0.18,
+    }
+    if valuation.verdict == "within_range":
+        return 0.0
+    return severity_penalties.get(valuation.severity, 0.0)

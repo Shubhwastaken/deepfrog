@@ -11,5 +11,7 @@ reports/
 data/
 *.egg-info/
 .pytest_cache/
+.pytest-temp/
+pytest-cache-files-*/
 *-dev.out.log
 *-dev.err.log

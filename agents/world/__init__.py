@@ -2,5 +2,6 @@
 
 from agents.schemas import World, WorldGenerationInput, WorldGenerationResult
 from agents.world.agent import WorldAgent
+from agents.world.builder import WorldBuilder
 
-__all__ = ["WorldAgent", "World", "WorldGenerationInput", "WorldGenerationResult"]
+__all__ = ["WorldAgent", "WorldBuilder", "World", "WorldGenerationInput", "WorldGenerationResult"]

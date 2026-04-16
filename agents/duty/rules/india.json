@@ -1,0 +1,18 @@
+{
+  "country": "India",
+  "currency": "INR",
+  "default_duty_rate_percent": 10.0,
+  "default_tax_rate_percent": 18.0,
+  "rates": [
+    {
+      "hs_prefix": "851712",
+      "duty_rate_percent": 20.0,
+      "tax_rate_percent": 18.0,
+      "description": "India mobile handset tariff: Basic Customs Duty 20% plus IGST 18%"
+    }
+  ],
+  "notes": [
+    "IGST is applied on the assessable value plus Basic Customs Duty for deterministic screening.",
+    "HS 851712 covers cellular/mobile handset scenarios used by this pipeline."
+  ]
+}

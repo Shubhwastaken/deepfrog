@@ -16,10 +16,19 @@ def build_plain_language_summary(winner: WinnerDetails, comparison_table: list[C
 
     alternative_count = max(0, len(comparison_table) - 1)
     compliance_phrase = "compliant" if winner.is_compliant else "non-compliant"
+    valuation_phrase = ""
+    if winner.valuation_verdict and winner.valuation_verdict != "within_range":
+        valuation_phrase = (
+            f" The valuation screen marked it as {winner.valuation_verdict.replace('_', ' ')} "
+            f"with {winner.valuation_severity or 'unknown'} severity."
+        )
     return (
         f"{winner.label} is the recommended customs strategy with HS code {winner.hs_code}. "
-        f"It was selected because it offers the strongest balance of compliance, landed cost, and risk, "
+        f"It was selected because it offers the strongest balance of compliance, landed cost, risk, "
+        f"and a world confidence score of {winner.confidence_score:.2f}, "
+        f"with a {winner.strategy_type or 'baseline'} strategy profile, "
         f"with a {compliance_phrase} posture, estimated duty of {format_currency(winner.estimated_duty_usd)}, "
         f"and total landed cost of {format_currency(winner.total_landed_cost_usd)}. "
         f"{alternative_count} alternative world(s) were considered."
+        f"{valuation_phrase}"
     )

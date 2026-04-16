@@ -8,7 +8,7 @@ Interactive docs: `http://localhost:8000/docs`
 ### POST /api/auth/login
 Login and receive JWT token.
 ```json
-{ "email": "admin@customs.ai", "password": "secret" }
+{ "email": "your-admin-email", "password": "your-admin-password" }
 ```
 
 ### POST /api/upload

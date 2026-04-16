@@ -12,13 +12,43 @@ from app.core.config import settings
 PASSWORD_HASH_ITERATIONS = 390000
 
 
+def _create_token(data: dict, *, expires_delta: timedelta, token_type: str) -> str:
+    expire = datetime.utcnow() + expires_delta
+    return jwt.encode(
+        {**data, "exp": expire, "token_type": token_type},
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM,
+    )
+
+
 def create_access_token(data: dict) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return jwt.encode({**data, "exp": expire}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return _create_token(
+        data,
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        token_type="access",
+    )
+
+
+def create_refresh_token(data: dict) -> str:
+    return _create_token(
+        data,
+        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+        token_type="refresh",
+    )
 
 
 def decode_access_token(token: str) -> dict:
-    return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    if payload.get("token_type") != "access":
+        raise JWTError("Expected an access token.")
+    return payload
+
+
+def decode_refresh_token(token: str) -> dict:
+    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    if payload.get("token_type") != "refresh":
+        raise JWTError("Expected a refresh token.")
+    return payload
 
 
 def hash_secret(secret: str) -> str:
@@ -69,6 +99,8 @@ def mask_email(email: str) -> str:
 __all__ = [
     "JWTError",
     "create_access_token",
+    "create_refresh_token",
+    "decode_refresh_token",
     "decode_access_token",
     "generate_otp_code",
     "hash_secret",

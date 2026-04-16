@@ -1,12 +1,28 @@
 import axios from "axios";
 
-const configuredApiBase = process.env.REACT_APP_API_URL;
-const API_BASE =
-  configuredApiBase !== undefined
-    ? configuredApiBase
-    : window.location.port === "3000"
-      ? "http://localhost:8000"
-      : "";
+import { API_BASE } from "./apiBase";
+
+const AUTH_USER_KEY = "auth_user";
+const ACCESS_TOKEN_KEY = "token";
+const REFRESH_TOKEN_KEY = "refresh_token";
+
+export const clearSession = () => {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
+};
+
+export const setSession = ({ access_token, refresh_token, user }) => {
+  if (access_token) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, access_token);
+  }
+  if (refresh_token) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refresh_token);
+  }
+  if (user) {
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  }
+};
 
 export const beginLogin = async (email, password) => {
   const res = await axios.post(`${API_BASE}/api/auth/login`, { email, password });
@@ -18,14 +34,31 @@ export const verifyOtp = async (challengeId, otpCode) => {
     challenge_id: challengeId,
     otp_code: otpCode,
   });
-  localStorage.setItem("token", res.data.access_token);
+  setSession(res.data);
+  return res.data;
+};
+
+export const refreshAccessToken = async () => {
+  const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+  if (!refreshToken) {
+    throw new Error("No refresh token available");
+  }
+
+  const res = await axios.post(`${API_BASE}/api/auth/refresh`, {
+    refresh_token: refreshToken,
+  });
+  setSession(res.data);
   return res.data;
 };
 
 export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("auth_user");
+  clearSession();
 };
 
-export const getToken = () => localStorage.getItem("token");
-export const isAuthenticated = () => Boolean(getToken());
+export const getToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
+export const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
+export const getAuthUser = () => {
+  const rawUser = localStorage.getItem(AUTH_USER_KEY);
+  return rawUser ? JSON.parse(rawUser) : null;
+};
+export const isAuthenticated = () => Boolean(getToken() || getRefreshToken());

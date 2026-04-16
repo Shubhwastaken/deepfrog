@@ -53,7 +53,7 @@ class HSCodeCandidate(CustomsBrainModel):
 class HSCodeResult(CustomsBrainModel):
     """Ranked HS code candidates for a product."""
 
-    candidates: list[HSCodeCandidate] = Field(..., min_length=2, max_length=4)
+    candidates: list[HSCodeCandidate] = Field(..., min_length=1, max_length=4)
 
 
 class World(CustomsBrainModel):
@@ -64,6 +64,11 @@ class World(CustomsBrainModel):
     confidence_score: float = Field(..., ge=0.0, le=1.0)
     extraction_data: ExtractionResult
     label: str
+    strategy_type: str = "baseline"
+    assumptions: list[str] = Field(default_factory=list)
+    required_documents: list[str] = Field(default_factory=list)
+    risk_flags: list[str] = Field(default_factory=list)
+    generation_reasoning: str = ""
 
 
 class WorldGenerationInput(CustomsBrainModel):
@@ -89,7 +94,9 @@ class ComplianceRule(CustomsBrainModel):
     """A country rule applied during deterministic compliance checks."""
 
     hs_prefix: str | None = None
+    product_keywords: list[str] = Field(default_factory=list)
     description: str
+    citation: str | None = None
     compliant: bool = True
     warning: str | None = None
     violation: str | None = None
@@ -116,6 +123,35 @@ class ComplianceResult(CustomsBrainModel):
     violations: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     applicable_rules: list[str] = Field(default_factory=list)
+
+
+class ValuationBenchmark(CustomsBrainModel):
+    """Reference benchmark used to screen for invoice anomalies."""
+
+    hs_prefix: str | None = None
+    product_keywords: list[str] = Field(default_factory=list)
+    median_unit_value_usd: float = Field(..., gt=0.0)
+    description: str
+    source_note: str | None = None
+
+
+class ValuationInput(CustomsBrainModel):
+    """Input contract for valuation screening."""
+
+    world: World
+
+
+class ValuationResult(CustomsBrainModel):
+    """Deterministic valuation-screening output for a world."""
+
+    world_id: UUID
+    declared_unit_value_usd: float | None = Field(default=None, ge=0.0)
+    reference_median_unit_value_usd: float | None = Field(default=None, ge=0.0)
+    ratio_to_reference: float | None = Field(default=None, ge=0.0)
+    verdict: Literal["under_invoiced", "within_range", "over_invoiced", "insufficient_data"]
+    severity: Literal["none", "low", "medium", "high"]
+    explanation: str
+    evidence: list[str] = Field(default_factory=list)
 
 
 class DutyInput(CustomsBrainModel):
@@ -155,12 +191,20 @@ class DutyResult(CustomsBrainModel):
     calculation_breakdown: str
 
 
+class CriticCitation(CustomsBrainModel):
+    """A compact evidence citation produced by the critic."""
+
+    title: str
+    detail: str
+
+
 class DebateInput(CustomsBrainModel):
     """Input contract for the devil's-advocate review."""
 
     world: World
     compliance_result: ComplianceResult
     duty_result: DutyResult
+    valuation_result: ValuationResult | None = None
 
 
 class DebateResult(CustomsBrainModel):
@@ -171,6 +215,8 @@ class DebateResult(CustomsBrainModel):
     critiques: list[str] = Field(default_factory=list)
     strengths: list[str] = Field(default_factory=list)
     recommendation: Literal["accept", "reject", "review"]
+    citations: list[CriticCitation] = Field(default_factory=list)
+    fallback_used: bool = False
 
 
 class EvaluationBundle(CustomsBrainModel):
@@ -178,16 +224,19 @@ class EvaluationBundle(CustomsBrainModel):
 
     world: World
     compliance_result: ComplianceResult
+    valuation_result: ValuationResult | None = None
     duty_result: DutyResult
     debate_result: DebateResult
+    critic_result: DebateResult | None = None
 
 
 class MetaScoringConfig(CustomsBrainModel):
     """Weights applied by the meta scorer."""
 
-    compliance_weight: float = Field(default=0.5, ge=0.0)
-    cost_weight: float = Field(default=0.3, ge=0.0)
+    compliance_weight: float = Field(default=0.4, ge=0.0)
+    cost_weight: float = Field(default=0.2, ge=0.0)
     risk_weight: float = Field(default=0.2, ge=0.0)
+    confidence_weight: float = Field(default=0.2, ge=0.0)
 
 
 class MetaInput(CustomsBrainModel):
@@ -213,8 +262,30 @@ class AlternativeSummary(CustomsBrainModel):
     world_id: UUID
     label: str
     hs_code: str = Field(..., pattern=r"^\d{6}$")
+    confidence_score: float = Field(..., ge=0.0, le=1.0)
+    is_compliant: bool
+    duty_rate_percent: float = Field(..., ge=0.0)
+    estimated_duty_usd: float = Field(..., ge=0.0)
+    total_landed_cost_usd: float = Field(..., ge=0.0)
+    risk_score: float = Field(..., ge=0.0, le=1.0)
     composite_score: float
     recommendation: Literal["accept", "reject", "review"]
+    strategy_type: str = ""
+    assumptions: list[str] = Field(default_factory=list)
+    required_documents: list[str] = Field(default_factory=list)
+    risk_flags: list[str] = Field(default_factory=list)
+    generation_reasoning: str = ""
+    compliance_violations: list[str] = Field(default_factory=list)
+    compliance_warnings: list[str] = Field(default_factory=list)
+    applicable_rules: list[str] = Field(default_factory=list)
+    duty_calculation_breakdown: str = ""
+    valuation_verdict: str | None = None
+    valuation_severity: str | None = None
+    valuation_explanation: str | None = None
+    valuation_evidence: list[str] = Field(default_factory=list)
+    critic_critiques: list[str] = Field(default_factory=list)
+    critic_strengths: list[str] = Field(default_factory=list)
+    critic_citations: list[CriticCitation] = Field(default_factory=list)
 
 
 class WinnerDetails(CustomsBrainModel):
@@ -225,6 +296,7 @@ class WinnerDetails(CustomsBrainModel):
     hs_code: str = Field(..., pattern=r"^\d{6}$")
     product_description: str
     destination_country: str | None = None
+    confidence_score: float = Field(..., ge=0.0, le=1.0)
     is_compliant: bool
     duty_rate_percent: float = Field(..., ge=0.0)
     estimated_duty_usd: float = Field(..., ge=0.0)
@@ -232,6 +304,22 @@ class WinnerDetails(CustomsBrainModel):
     risk_score: float = Field(..., ge=0.0, le=1.0)
     recommendation: Literal["accept", "reject", "review"]
     reasoning: str
+    strategy_type: str = ""
+    assumptions: list[str] = Field(default_factory=list)
+    required_documents: list[str] = Field(default_factory=list)
+    risk_flags: list[str] = Field(default_factory=list)
+    generation_reasoning: str = ""
+    compliance_violations: list[str] = Field(default_factory=list)
+    compliance_warnings: list[str] = Field(default_factory=list)
+    applicable_rules: list[str] = Field(default_factory=list)
+    duty_calculation_breakdown: str = ""
+    valuation_verdict: str | None = None
+    valuation_severity: str | None = None
+    valuation_explanation: str | None = None
+    valuation_evidence: list[str] = Field(default_factory=list)
+    critic_critiques: list[str] = Field(default_factory=list)
+    critic_strengths: list[str] = Field(default_factory=list)
+    critic_citations: list[CriticCitation] = Field(default_factory=list)
 
 
 class ComparisonTableRow(CustomsBrainModel):
@@ -248,6 +336,8 @@ class ComparisonTableRow(CustomsBrainModel):
     risk_score: float = Field(..., ge=0.0, le=1.0)
     recommendation: Literal["accept", "reject", "review"]
     composite_score: float
+    valuation_verdict: str | None = None
+    valuation_severity: str | None = None
 
 
 class OutputInput(CustomsBrainModel):

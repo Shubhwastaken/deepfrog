@@ -49,9 +49,15 @@ class ComplianceAgent(BaseAgent[ComplianceInput, ComplianceResult]):
         applicable_rules = list(ruleset.applicable_rules)
 
         for rule in ruleset.hs_rules:
-            if rule.hs_prefix and not world.hs_code.startswith(rule.hs_prefix):
+            hs_matches = not rule.hs_prefix or world.hs_code.startswith(rule.hs_prefix)
+            keyword_matches = not rule.product_keywords or any(
+                keyword.lower() in description for keyword in rule.product_keywords
+            )
+            if not hs_matches or not keyword_matches:
                 continue
             applicable_rules.append(rule.description)
+            if rule.citation:
+                applicable_rules.append(rule.citation)
             if rule.warning:
                 warnings.append(rule.warning)
             if not rule.compliant:

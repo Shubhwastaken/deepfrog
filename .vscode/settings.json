@@ -1,0 +1,14 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}",
+    "${workspaceFolder}\\backend",
+    "${workspaceFolder}\\workers",
+    "${workspaceFolder}\\agents",
+    "${workspaceFolder}\\shared"
+  ],
+  "python.analysis.exclude": [
+    "**/pytest-cache-files-*",
+    ".pytest-temp"
+  ]
+}

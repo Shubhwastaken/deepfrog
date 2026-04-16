@@ -1,0 +1,27 @@
+{
+  "benchmarks": [
+    {
+      "hs_prefix": "851712",
+      "product_keywords": [
+        "mobile",
+        "phone",
+        "smartphone",
+        "handset"
+      ],
+      "median_unit_value_usd": 3.5,
+      "description": "Reference handset benchmark used for deterministic under-invoicing screening.",
+      "source_note": "Median benchmark used by the local pipeline to flag suspiciously low handset declarations."
+    },
+    {
+      "hs_prefix": "847130",
+      "product_keywords": [
+        "laptop",
+        "computer",
+        "notebook"
+      ],
+      "median_unit_value_usd": 450.0,
+      "description": "Reference laptop benchmark used for deterministic valuation screening.",
+      "source_note": "Illustrative deterministic benchmark for portable computers."
+    }
+  ]
+}

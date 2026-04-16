@@ -1,5 +1,6 @@
 """Customs Brain agent package."""
 
+from agents.registry import AGENT_REGISTRY, get_registered_agents
 from agents.schemas import (
     AlternativeSummary,
     ComparisonTableRow,
@@ -9,6 +10,7 @@ from agents.schemas import (
     ComplianceRuleSet,
     DebateInput,
     DebateResult,
+    CriticCitation,
     DutyInput,
     DutyResult,
     EvaluationBundle,
@@ -26,6 +28,9 @@ from agents.schemas import (
     ReportResult,
     TariffRateRule,
     TariffRuleSet,
+    ValuationBenchmark,
+    ValuationInput,
+    ValuationResult,
     WinnerDetails,
     World,
     WorldGenerationInput,
@@ -35,6 +40,7 @@ from agents.schemas import (
 __all__ = [
     "AlternativeSummary",
     "ComparisonTableRow",
+    "CriticCitation",
     "ComplianceInput",
     "ComplianceResult",
     "ComplianceRule",
@@ -58,8 +64,13 @@ __all__ = [
     "ReportResult",
     "TariffRateRule",
     "TariffRuleSet",
+    "ValuationBenchmark",
+    "ValuationInput",
+    "ValuationResult",
     "WinnerDetails",
     "World",
     "WorldGenerationInput",
     "WorldGenerationResult",
+    "AGENT_REGISTRY",
+    "get_registered_agents",
 ]

@@ -39,6 +39,13 @@ class ReportAgent(BaseAgent[ReportInput, ReportResult]):
         if not alternative_rows:
             alternative_rows = "- None"
 
+        assumption_rows = "\n".join([f"- {item}" for item in winner.assumptions]) or "- None"
+        document_rows = "\n".join([f"- {item}" for item in winner.required_documents]) or "- None"
+        risk_rows = "\n".join([f"- {item}" for item in winner.risk_flags]) or "- None"
+        citation_rows = "\n".join(
+            [f"- {item.title}: {item.detail}" for item in winner.critic_citations]
+        ) or "- None"
+
         report_markdown = f"""# Customs Brain Evaluation Report
 
 ## Executive Summary
@@ -47,18 +54,37 @@ class ReportAgent(BaseAgent[ReportInput, ReportResult]):
 ## Recommended World
 - World ID: `{winner.world_id}`
 - Label: {winner.label}
+- Strategy Type: {winner.strategy_type.replace("_", " ").title() or "Unknown"}
 - Final HS Code: `{winner.hs_code}`
 - Product Description: {winner.product_description}
 - Destination Country: {winner.destination_country or "Unknown"}
+- World Confidence: {winner.confidence_score:.2f}
 - Compliance Status: {"Compliant" if winner.is_compliant else "Non-compliant"}
 - Duty Rate: {winner.duty_rate_percent:.2f}%
 - Estimated Duty: {format_currency(winner.estimated_duty_usd)}
 - Total Landed Cost: {format_currency(winner.total_landed_cost_usd)}
 - Risk Score: {winner.risk_score:.2f}
 - Recommendation: {winner.recommendation}
+- Valuation Verdict: {(winner.valuation_verdict or "not assessed").replace("_", " ")}
+- Valuation Severity: {winner.valuation_severity or "n/a"}
 
 ## Meta Reasoning
 {output.meta_reasoning}
+
+## World Generation Reasoning
+{winner.generation_reasoning or "No additional world-generation reasoning recorded."}
+
+## World Assumptions
+{assumption_rows}
+
+## Required Documents
+{document_rows}
+
+## Risk Flags
+{risk_rows}
+
+## Critic Citations
+{citation_rows}
 
 ## Alternatives
 {alternative_rows}

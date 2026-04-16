@@ -1,0 +1,25 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "include": [
+    "backend",
+    "workers",
+    "agents",
+    "shared",
+    "tests"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/pytest-cache-files-*",
+    ".pytest-temp",
+    "frontend/build"
+  ],
+  "extraPaths": [
+    ".",
+    "backend",
+    "workers",
+    "agents",
+    "shared"
+  ],
+  "pythonVersion": "3.11"
+}
