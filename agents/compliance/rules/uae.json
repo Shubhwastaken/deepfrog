@@ -1,0 +1,6 @@
+{
+  "country": "UAE",
+  "restricted_items": ["pork_products", "alcohol_without_permit"],
+  "required_documents": ["invoice", "certificate_of_origin", "bill_of_lading"],
+  "duty_rates": {"default": 0.05, "luxury": 0.50}
+}

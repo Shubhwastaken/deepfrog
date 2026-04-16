@@ -1,0 +1,6 @@
+{
+  "country": "India",
+  "restricted_items": ["weapons", "narcotics"],
+  "required_documents": ["invoice", "packing_list", "bill_of_lading"],
+  "duty_rates": {"default": 0.10, "electronics": 0.18}
+}
