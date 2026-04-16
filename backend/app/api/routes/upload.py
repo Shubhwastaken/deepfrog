@@ -28,15 +28,10 @@ async def upload_document(
         return {
             "job_id": job["job_id"],
             "status": job["status"],
-            "document_paths": job["document_paths"],
         }
 
     job_id = await create_job(invoice_path, bill_of_lading_path, current_user.email)
     return {
         "job_id": job_id,
         "status": "queued",
-        "document_paths": {
-            "invoice": invoice_path,
-            "bill_of_lading": bill_of_lading_path,
-        },
     }

@@ -26,7 +26,6 @@ export default function Upload() {
       upsertJob({
         job_id: response.job_id,
         status: response.status,
-        document_paths: response.document_paths,
       });
       navigate(`/results/${response.job_id}`);
     } catch (uploadError) {

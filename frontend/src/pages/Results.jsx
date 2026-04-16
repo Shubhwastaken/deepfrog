@@ -26,7 +26,6 @@ export default function Results() {
         upsertJob({
           job_id: response.job_id,
           status: response.status,
-          document_paths: response.document_paths,
         });
         if (response.status === "queued" || response.status === "processing") {
           pollTimer = window.setTimeout(loadResults, 4000);
@@ -101,9 +100,7 @@ export default function Results() {
             <span className="eyebrow">Job Status</span>
             <h2 style={{ marginBottom: "8px" }}>{results ? results.status : "Loading"}</h2>
             <p className="muted" style={{ margin: 0 }}>
-              {results?.document_paths
-                ? `Invoice: ${results.document_paths.invoice} | Bill of lading: ${results.document_paths.bill_of_lading}`
-                : "Document metadata will appear here once the API returns."}
+              Source document paths are hidden from the browser. Track progress here and download the report when the job completes.
             </p>
           </div>
           <div className="button-row">

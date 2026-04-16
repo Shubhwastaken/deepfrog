@@ -20,9 +20,7 @@ async def get_results(job_id: str, current_user: User = Depends(get_current_user
         return ResultSchema(
             job_id=job["job_id"],
             status=job["status"],
-            document_paths=job["document_paths"],
             results=job["results"],
-            report_path=job["report_path"],
             error_message=job["error_message"],
         )
 
@@ -35,11 +33,6 @@ async def get_results(job_id: str, current_user: User = Depends(get_current_user
     return ResultSchema(
         job_id=job.id,
         status=job.status,
-        document_paths={
-            "invoice": job.invoice_path,
-            "bill_of_lading": job.bill_of_lading_path,
-        },
         results=job.results,
-        report_path=job.report_path,
         error_message=job.error_message,
     )
