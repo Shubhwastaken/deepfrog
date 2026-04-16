@@ -94,7 +94,7 @@ class ComplianceAgent(BaseAgent[ComplianceInput, ComplianceResult]):
             if path.exists():
                 with path.open("r", encoding="utf-8") as file_obj:
                     payload = json.load(file_obj)
-                return ComplianceRuleSet.model_validate(payload)
+                return ComplianceRuleSet.model_validate(self._normalize_ruleset_payload(payload))
         return None
 
     def _candidate_rule_paths(self, country: str) -> list[Path]:
@@ -118,3 +118,25 @@ class ComplianceAgent(BaseAgent[ComplianceInput, ComplianceResult]):
                 seen.add(item)
                 result.append(item)
         return result
+
+    def _normalize_ruleset_payload(self, payload: dict) -> dict:
+        """Map legacy compliance-rule JSON into the current schema."""
+
+        normalized = dict(payload)
+        restricted_items = normalized.pop("restricted_items", [])
+        required_documents = normalized.pop("required_documents", [])
+        duty_rates = normalized.pop("duty_rates", None)
+
+        existing_keywords = list(normalized.get("prohibited_keywords", []))
+        normalized["prohibited_keywords"] = existing_keywords + list(restricted_items)
+
+        existing_rules = list(normalized.get("applicable_rules", []))
+        normalized["applicable_rules"] = existing_rules + [
+            f"Required document: {document_name}" for document_name in required_documents
+        ]
+
+        notes = list(normalized.get("notes", []))
+        if duty_rates:
+            notes.append(f"Legacy duty reference present in compliance rules: {duty_rates}")
+        normalized["notes"] = notes
+        return normalized

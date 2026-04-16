@@ -1,9 +1,15 @@
 __pycache__/
 *.pyc
 .env
+.env.*
+.venv/
+venv/
 node_modules/
 build/
 uploads/
 reports/
+data/
 *.egg-info/
 .pytest_cache/
+*-dev.out.log
+*-dev.err.log

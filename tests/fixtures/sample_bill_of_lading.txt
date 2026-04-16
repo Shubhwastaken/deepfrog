@@ -1,0 +1,14 @@
+BILL OF LADING
+BL Number: BL-DXB-7781
+Shipper: Apex Components Pvt Ltd
+Consignee: BlueWave Trading LLC
+Port of Loading: Nhava Sheva, India
+Port of Discharge: Jebel Ali, UAE
+Country of Origin: India
+Country of Destination: United Arab Emirates
+
+Cargo Description:
+250 cartons containing portable lithium-ion power banks for consumer electronics.
+
+Gross Weight: 820 KG
+Marks and Numbers: BW-PB-2026

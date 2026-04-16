@@ -150,6 +150,14 @@ class BaseAgent(ABC, Generic[InputModelT, OutputModelT]):
         if isinstance(response, response_model):
             return response
 
+        if self._looks_like_llm_response(response):
+            raw_text = self._extract_text(response)
+            try:
+                return response_model.model_validate_json(raw_text)
+            except ValidationError:
+                payload = json.loads(self._extract_json(raw_text))
+                return response_model.model_validate(payload)
+
         if isinstance(response, BaseModel):
             return response_model.model_validate(response.model_dump())
 
@@ -162,6 +170,14 @@ class BaseAgent(ABC, Generic[InputModelT, OutputModelT]):
         except ValidationError:
             payload = json.loads(self._extract_json(raw_text))
             return response_model.model_validate(payload)
+
+    def _looks_like_llm_response(self, response: Any) -> bool:
+        """Detect provider response wrappers that still need text extraction."""
+
+        return any(
+            hasattr(response, attribute)
+            for attribute in ("output_text", "choices", "content", "output")
+        )
 
     def _extract_text(self, response: Any) -> str:
         """Extract a plain-text payload from common SDK response objects."""

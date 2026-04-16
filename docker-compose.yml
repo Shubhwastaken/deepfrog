@@ -23,6 +23,9 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://user:pass@postgres/customs_brain
       REDIS_URL: redis://redis:6379
+      SHARED_DATA_DIR: /app/data
+      UPLOAD_DIR: /app/data/uploads
+      REPORT_DIR: /app/data/reports
     depends_on: [postgres, redis]
     ports:
       - "8000:8000"
@@ -30,6 +33,7 @@ services:
       - ./backend:/app/backend
       - ./agents:/app/agents
       - ./shared:/app/shared
+      - shared_data:/app/data
 
   worker:
     build:
@@ -37,8 +41,14 @@ services:
       dockerfile: workers/Dockerfile
     env_file: .env
     environment:
+      DATABASE_URL: postgresql+asyncpg://user:pass@postgres/customs_brain
       REDIS_URL: redis://redis:6379
+      SHARED_DATA_DIR: /app/data
+      UPLOAD_DIR: /app/data/uploads
+      REPORT_DIR: /app/data/reports
     depends_on: [postgres, redis]
+    volumes:
+      - shared_data:/app/data
 
   frontend:
     build: ./frontend
@@ -56,3 +66,4 @@ services:
 
 volumes:
   pgdata:
+  shared_data:

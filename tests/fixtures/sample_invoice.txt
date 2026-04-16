@@ -1,0 +1,17 @@
+COMMERCIAL INVOICE
+Invoice Number: INV-2026-0042
+Invoice Date: 2026-04-16
+Seller: Apex Components Pvt Ltd
+Buyer: BlueWave Trading LLC
+Origin Country: India
+Destination Country: United Arab Emirates
+Incoterms: CIF Dubai
+Currency: USD
+
+Item Description:
+Portable lithium-ion power banks, 10000mAh, packed for retail sale.
+
+Quantity: 250 pieces
+Unit Price: 18.00 USD
+Total Declared Value: 4500.00 USD
+Suggested HS Code: 850760

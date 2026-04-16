@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
@@ -10,9 +12,30 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/results/:jobId" element={<Results />} />
+        <Route
+          path="/dashboard"
+          element={(
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/upload"
+          element={(
+            <ProtectedRoute>
+              <Upload />
+            </ProtectedRoute>
+          )}
+        />
+        <Route
+          path="/results/:jobId"
+          element={(
+            <ProtectedRoute>
+              <Results />
+            </ProtectedRoute>
+          )}
+        />
       </Routes>
     </Router>
   );
