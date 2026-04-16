@@ -7,3 +7,10 @@ uploads/
 reports/
 *.egg-info/
 .pytest_cache/
+
+# Local Environment & Binaries
+.venv/
+Redis/
+*.zip
+*.db
+scratch/

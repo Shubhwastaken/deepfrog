@@ -1,58 +1,60 @@
+# Docker Compose — Structure Only
+# Full implementation to be added later
+
 version: "3.9"
 
 services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: customs_brain
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+  # ── FastAPI Backend ─────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
-      - "5432:5432"
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/customs_brain
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - postgres
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
 
+  # ── Worker (scale with --scale worker=N) ────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/customs_brain
+      - REDIS_URL=redis://redis:6379
+      - WORKER_ID=worker-1
+    depends_on:
+      - redis
+      - postgres
+    command: python -m backend.worker
+    deploy:
+      replicas: 2
+
+  # ── Redis ───────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-
-  backend:
-    build: ./backend
-    env_file: .env
-    environment:
-      DATABASE_URL: postgresql+asyncpg://user:pass@postgres/customs_brain
-      REDIS_URL: redis://redis:6379
-    depends_on: [postgres, redis]
-    ports:
-      - "8000:8000"
     volumes:
-      - ./backend:/app/backend
-      - ./agents:/app/agents
-      - ./shared:/app/shared
+      - redis_data:/data
 
-  worker:
-    build:
-      context: .
-      dockerfile: workers/Dockerfile
-    env_file: .env
+  # ── PostgreSQL ──────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
     environment:
-      REDIS_URL: redis://redis:6379
-    depends_on: [postgres, redis]
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    depends_on: [backend]
-
-  nginx:
-    image: nginx:alpine
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=customs_brain
     volumes:
-      - ./infra/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-    ports:
-      - "80:80"
-    depends_on: [backend, frontend]
+      - pg_data:/var/lib/postgresql/data
 
 volumes:
-  pgdata:
+  redis_data:
+  pg_data:

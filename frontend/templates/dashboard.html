@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customs Brain | Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #0a0f1e;
+            --surface: rgba(20, 30, 55, 0.8);
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --pass-color: #10b981;
+            --warn-color: #f59e0b;
+            --fail-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAV ── */
+        nav {
+            padding: 1.2rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10, 15, 30, 0.95);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--primary-light);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 6px 14px 6px 6px;
+            border-radius: 99px;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary), #ec4899);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        /* ── MAIN ── */
+        main {
+            flex: 1;
+            padding: 3rem 2.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            margin-bottom: 2.5rem;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .page-title p {
+            color: var(--muted);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── UPLOAD SECTION ── */
+        .upload-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            animation: fadeUp 0.6s 0.1s ease both;
+        }
+
+        .upload-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-drop {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .file-drop:hover,
+        .file-drop.has-file {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .file-drop input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .drop-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            transition: all 0.3s;
+        }
+
+        .invoice-icon {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+        }
+
+        .lading-icon {
+            background: rgba(236, 72, 153, 0.1);
+            color: #ec4899;
+        }
+
+        .file-drop h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .file-drop p {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .file-drop .file-name {
+            color: var(--success);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .file-drop.has-file .file-name {
+            display: block;
+        }
+
+        .file-drop.has-file p.hint {
+            display: none;
+        }
+
+        .process-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .process-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        .process-btn:active {
+            transform: scale(0.98);
+        }
+
+        .process-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── RESULTS ── */
+        .results-section {
+            animation: fadeUp 0.6s 0.2s ease both;
+        }
+
+        .results-section h2 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-banner {
+            padding: 1.2rem 1.8rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .status-pass {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--pass-color);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warn-color);
+        }
+
+        .status-fail {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--fail-color);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.4rem;
+        }
+
+        .result-card .card-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.6rem;
+        }
+
+        .result-card .card-value {
+            font-size: 1rem;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .result-card .card-value.mono {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary-light);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .result-card .card-value.null-val {
+            color: var(--muted);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-block {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.4rem;
+        }
+
+        .detail-block h3 {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-key {
+            color: var(--muted);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .detail-val {
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .detail-val.null-val {
+            color: var(--muted);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .issues-block {
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 16px;
+            padding: 1.4rem;
+        }
+
+        .issues-block h3 {
+            font-size: 0.8rem;
+            color: var(--warn-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .issue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+        }
+
+        .issue-item:last-child {
+            border-bottom: none;
+        }
+
+        .issue-bullet {
+            width: 6px;
+            height: 6px;
+            background: var(--warn-color);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+
+        .issue-text {
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-pass {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--pass-color);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warn-color);
+        }
+
+        .badge-fail {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--fail-color);
+        }
+
+        /* ── TOASTS ── */
+        .toast-container {
+            position: fixed;
+            top: 5rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .toast {
+            padding: 0.8rem 1.4rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--error);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ── SPINNER ── */
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── PROCESSING CARD ── */
+        .processing-card {
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.2);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-color: rgba(99, 102, 241, 0.4); }
+            50% { border-color: rgba(99, 102, 241, 1); }
+            100% { border-color: rgba(99, 102, 241, 0.4); }
+        }
+
+        .status-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .status-sub {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            position: relative;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .step.active .step-dot {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .step.done .step-dot {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .step.active .step-label {
+            color: var(--primary-light);
+        }
+
+        @media (max-width: 768px) {
+
+            .upload-grid,
+            .results-grid,
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">Customs <span>Brain</span></div>
+        <div class="user-pill">
+            <div class="avatar">{{ session.get('user_email', 'U')[0].upper() }}</div>
+            <span class="user-email">{{ session.get('user_email', 'User') }}</span>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-title">
+            <h1>Compliance Dashboard</h1>
+            <p>Upload an Invoice and Bill of Lading to run the AI compliance check.</p>
+        </div>
+
+        <!-- Upload Form -->
+        <div class="upload-section">
+            <h2>📂 Upload Documents</h2>
+            <form id="process-form" action="/process" method="POST" enctype="multipart/form-data">
+                <div class="upload-grid">
+                    <!-- Invoice -->
+                    <div class="file-drop" id="invoice-drop">
+                        <input type="file" name="invoice" accept="application/pdf" id="invoice-input"
+                            onchange="handleFile(this, 'invoice-drop')">
+                        <div class="drop-icon invoice-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                            </svg>
+                        </div>
+                        <h3>Commercial Invoice</h3>
+                        <p class="hint">Click to upload PDF</p>
+                        <div class="file-name" id="invoice-name"></div>
+                    </div>
+
+                    <!-- Bill of Lading -->
+                    <div class="file-drop" id="lading-drop">
+                        <input type="file" name="lading" accept="application/pdf" id="lading-input"
+                            onchange="handleFile(this, 'lading-drop')">
+                        <div class="drop-icon lading-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                                <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+                            </svg>
+                        </div>
+                        <h3>Bill of Lading</h3>
+                        <p class="hint">Click to upload PDF</p>
+                        <div class="file-name" id="lading-name"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="process-btn" id="process-btn" onclick="startProcessing()">
+                    <div class="spinner" id="spinner"></div>
+                    <span id="btn-text">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" style="vertical-align:-3px;margin-right:6px">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                        </svg>
+                        Run AI Analysis
+                    </span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Processing State (Visible if a job is in progress) -->
+        {% if current_job_id %}
+        <div class="processing-card" id="job-tracker">
+            <div class="status-header">
+                <div class="spinner" style="display:block; width:24px; height:24px; border-width:3px"></div>
+                Analyzing Documents...
+            </div>
+            <div class="status-sub" id="status-text">Your request is in the queue. Multiple AI workers are active.</div>
+            
+            <div class="progress-steps">
+                <div class="step" id="step-queued">
+                    <div class="step-dot">1</div>
+                    <div class="step-label">Queued</div>
+                </div>
+                <div class="step" id="step-processing">
+                    <div class="step-dot">2</div>
+                    <div class="step-label">AI Pipeline</div>
+                </div>
+                <div class="step" id="step-completed">
+                    <div class="step-dot">3</div>
+                    <div class="step-label">Finished</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Results Section -->
+        {% if results %}
+        <div class="results-section">
+            <h2>📊 Analysis Results</h2>
+
+            <!-- Status Banner -->
+            {% set decl = results.get('declaration', {}) %}
+            {% set comp = results.get('compliance', {}) %}
+            {% set final_status = decl.get('status', comp.get('status', 'unknown')) %}
+
+            {% if final_status == 'approved' or final_status == 'pass' %}
+            <div class="status-banner status-pass">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Shipment Approved — All compliance checks passed.
+            </div>
+            {% else %}
+            <div class="status-banner status-warning">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+                Shipment Has Warnings — Review issues below before clearing.
+            </div>
+            {% endif %}
+
+            <!-- Key Summary Cards -->
+            {% set inv = results.get('invoice', {}) %}
+            {% set hs = results.get('hs_code', {}) %}
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="card-label">HS Code</div>
+                    <div class="card-value mono">{{ hs.get('hs_code', '---') }}</div>
+                    <div style="margin-top:6px">
+                        {% set conf = hs.get('confidence', '') %}
+                        {% if conf == 'high' %}<span class="badge badge-pass">{{ conf }}</span>
+                        {% elif conf == 'medium' %}<span class="badge badge-warning">{{ conf }}</span>
+                        {% else %}<span class="badge badge-fail">{{ conf or 'unknown' }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="result-card">
+                    <div class="card-label">Total Value</div>
+                    <div class="card-value {% if not inv.get('total_value') %}null-val{% endif %}">
+                        {% if inv.get('total_value') %}{{ inv.get('currency', '') }} {{ inv.get('total_value') }}{% else
+                        %}Not found{% endif %}
+                    </div>
+                </div>
+                <div class="result-card">
+                    <div class="card-label">Country of Origin</div>
+                    <div class="card-value {% if not inv.get('country_of_origin') %}null-val{% endif %}">
+                        {{ inv.get('country_of_origin') or 'Not found' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice + BoL Details -->
+            {% set bol = results.get('bol', {}) %}
+            <div class="detail-grid">
+                <div class="detail-block">
+                    <h3>📄 Invoice Details</h3>
+                    <div class="detail-row">
+                        <span class="detail-key">Exporter</span>
+                        <span class="detail-val {% if not inv.get('exporter') %}null-val{% endif %}">{{
+                            inv.get('exporter') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Importer</span>
+                        <span class="detail-val {% if not inv.get('importer') %}null-val{% endif %}">{{
+                            inv.get('importer') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Products</span>
+                        <span class="detail-val {% if not inv.get('products_summary') %}null-val{% endif %}">{{
+                            inv.get('products_summary') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Quantity</span>
+                        <span class="detail-val {% if not inv.get('total_quantity') %}null-val{% endif %}">{{
+                            inv.get('total_quantity') or 'Not found' }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-block">
+                    <h3>🚢 Bill of Lading Details</h3>
+                    <div class="detail-row">
+                        <span class="detail-key">Shipper</span>
+                        <span class="detail-val {% if not bol.get('shipper') %}null-val{% endif %}">{{
+                            bol.get('shipper') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Consignee</span>
+                        <span class="detail-val {% if not bol.get('consignee') %}null-val{% endif %}">{{
+                            bol.get('consignee') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Goods</span>
+                        <span class="detail-val {% if not bol.get('goods_description') %}null-val{% endif %}">{{
+                            bol.get('goods_description') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Packages</span>
+                        <span class="detail-val {% if not bol.get('packages') %}null-val{% endif %}">{{
+                            bol.get('packages') or 'Not found' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Weight</span>
+                        <span class="detail-val {% if not bol.get('weight') %}null-val{% endif %}">{{ bol.get('weight')
+                            or 'Not found' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issues -->
+            {% set issues = comp.get('issues', []) %}
+            {% if issues %}
+            <div class="issues-block">
+                <h3>⚠️ Compliance Issues ({{ issues|length }})</h3>
+                {% for issue in issues %}
+                <div class="issue-item">
+                    <div class="issue-bullet"></div>
+                    <span class="issue-text">{{ issue }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Toasts -->
+    <div class="toast-container" id="toast-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="toast {{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        function handleFile(input, dropId) {
+            const drop = document.getElementById(dropId);
+            const nameEl = drop.querySelector('.file-name');
+            if (input.files.length > 0) {
+                drop.classList.add('has-file');
+                nameEl.textContent = '✓ ' + input.files[0].name;
+            }
+        }
+
+        function startProcessing() {
+            const inv = document.getElementById('invoice-input').files.length > 0;
+            const lad = document.getElementById('lading-input').files.length > 0;
+            if (!inv || !lad) return;
+            const btn = document.getElementById('process-btn');
+            const spinner = document.getElementById('spinner');
+            const text = document.getElementById('btn-text');
+            setTimeout(() => {
+                btn.disabled = true;
+                spinner.style.display = 'block';
+                text.textContent = 'Processing...';
+            }, 10);
+        }
+
+        // Auto-dismiss toasts
+        setTimeout(() => {
+            document.querySelectorAll('.toast').forEach(t => {
+                t.style.transition = 'all 0.4s ease';
+                t.style.opacity = '0';
+                t.style.transform = 'translateX(20px)';
+                setTimeout(() => t.remove(), 400);
+            });
+        }, 5000);
+
+        // ── LIVE JOB POLLING ───────────────────────────────────────────────────
+        {% if current_job_id %}
+        const jobId = "{{ current_job_id }}";
+        const POLL_INTERVAL = 2000; // 2 seconds
+
+        function updateProgressUI(status) {
+            const steps = ['queued', 'processing', 'completed', 'failed'];
+            const labels = {
+                'queued': "In Queue — Waiting for an available AI worker...",
+                'processing': "Processing — Extracting OCR and running AI logic...",
+                'completed': "Complete — Analysis ready!",
+                'failed': "Failed — There was an error processing your documents."
+            };
+
+            document.getElementById('status-text').textContent = labels[status] || "Updating...";
+
+            // Update step visuals
+            const currentIdx = steps.indexOf(status);
+            steps.forEach((s, idx) => {
+                const el = document.getElementById('step-' + s);
+                if (!el) return;
+                
+                if (idx < currentIdx) {
+                    el.classList.add('done');
+                    el.classList.remove('active');
+                } else if (idx === currentIdx) {
+                    el.classList.add('active');
+                    el.classList.remove('done');
+                } else {
+                    el.classList.remove('active', 'done');
+                }
+            });
+
+            if (status === 'completed') {
+                // Stop polling immediately
+                jobId = null;
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        }
+
+        async function pollStatus() {
+            try {
+                const response = await fetch('/api/status/' + jobId);
+                const data = await response.json();
+                
+                updateProgressUI(data.status);
+                
+                if (data.status !== 'completed' && data.status !== 'failed') {
+                    setTimeout(pollStatus, POLL_INTERVAL);
+                }
+            } catch (err) {
+                console.error("Polling error:", err);
+                setTimeout(pollStatus, POLL_INTERVAL * 2); // Backoff on error
+            }
+        }
+
+        // Start polling
+        pollStatus();
+        {% endif %}
+    </script>
+</body>
+
+</html>

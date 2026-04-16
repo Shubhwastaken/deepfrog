@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customs Brain | Register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --error: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top left, #1e293b, #0f172a);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .bg-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            filter: blur(120px);
+            opacity: 0.1;
+            z-index: -1;
+            border-radius: 50%;
+        }
+        .glow-1 { top: -100px; left: -100px; }
+        .glow-2 { bottom: -100px; right: -100px; }
+
+        .top-link {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .top-link:hover { color: var(--text); }
+
+        .register-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .card-header { text-align: center; margin-bottom: 2rem; }
+        .card-header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .card-header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-muted); }
+        .form-group input {
+            width: 100%;
+            padding: 11px 16px;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+
+        .register-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+        .register-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        /* OTP Card View */
+        .otp-overlay { text-align: center; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .otp-display {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px dashed var(--primary);
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            color: var(--primary);
+        }
+
+        .toast-container { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .toast { padding: 0.75rem 1.5rem; border-radius: 50px; color: white; font-weight: 600; box-shadow: 0 10px 20px rgba(0,0,0,0.2); animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast.error { background: var(--error); }
+        .toast.success { background: var(--success); }
+        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="glow-2 bg-glow"></div>
+
+    <a href="/" class="top-link">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+        Back to Sign In
+    </a>
+
+    <div class="register-card">
+        {% if not show_otp %}
+        <div class="card-header">
+            <h1>Create Account</h1>
+            <p>Join Customs Brain for automated compliance</p>
+        </div>
+
+        <form method="POST" action="/register">
+            <input type="hidden" name="action" value="register">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="John Doe" value="{{ name or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="john@example.com" value="{{ email or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="register-btn">register</button>
+        </form>
+        {% else %}
+        <!-- OTP Step -->
+        <div class="otp-overlay">
+            <div class="card-header">
+                <h1>Verify OTP</h1>
+                <p>We've generated a security code for your session</p>
+            </div>
+            
+            <div class="otp-display">{{ demo_otp }}</div>
+            
+            <form method="POST" action="/register">
+                <input type="hidden" name="action" value="verify_otp">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <input type="text" name="otp" placeholder="Enter Code" maxlength="4" style="text-align: center; font-size: 1.2rem;" required>
+                </div>
+                <button type="submit" class="register-btn">Verify & Proceed</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="toast-container" id="toast-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="toast {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    <script>
+        const container = document.getElementById('toast-container');
+        if (container) {
+            setTimeout(() => {
+                const toasts = container.querySelectorAll('.toast');
+                toasts.forEach(t => {
+                    t.style.transition = 'all 0.4s ease';
+                    t.style.opacity = '0';
+                    setTimeout(() => t.remove(), 400);
+                });
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
