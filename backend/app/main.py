@@ -6,8 +6,10 @@ import uuid
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, metrics, report, results, upload
+from app.api.routes import auth, metrics, report, results, security, upload
+from app.db.auth_migrations import ensure_auth_schema
 from app.db.models import Base
+from app.db.sensitive_migrations import migrate_sensitive_storage
 from app.db.session import get_engine
 from app.services.auth_service import ensure_default_user
 from shared.utils.logger import configure_logging, get_logger
@@ -23,6 +25,7 @@ app.include_router(upload.router, prefix="/api", tags=["upload"])
 app.include_router(results.router, prefix="/api", tags=["results"])
 app.include_router(report.router, prefix="/api", tags=["report"])
 app.include_router(metrics.router, prefix="/api", tags=["metrics"])
+app.include_router(security.router, prefix="/api", tags=["security"])
 
 
 @app.middleware("http")
@@ -57,6 +60,8 @@ async def add_request_context(request: Request, call_next):
 async def startup() -> None:
     async with get_engine().begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
+    await ensure_auth_schema(get_engine())
+    await migrate_sensitive_storage(get_engine())
     await ensure_default_user()
 
 

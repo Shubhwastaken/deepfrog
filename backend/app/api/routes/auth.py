@@ -3,8 +3,10 @@ from pydantic import BaseModel
 
 from app.db.models import User
 from app.services.auth_service import (
+    begin_google_login,
     begin_password_login,
     get_current_user,
+    get_auth_provider_status,
     get_user_role,
     refresh_login_token,
     verify_login_otp,
@@ -27,6 +29,15 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
 
+class GoogleLoginRequest(BaseModel):
+    credential: str
+
+
+@router.get("/providers")
+async def auth_providers() -> dict:
+    return get_auth_provider_status()
+
+
 @router.post("/login")
 async def login(req: LoginRequest) -> dict:
     return await begin_password_login(req.email, req.password)
@@ -40,6 +51,11 @@ async def verify_otp(req: OTPVerifyRequest) -> dict:
 @router.post("/refresh")
 async def refresh(req: RefreshTokenRequest) -> dict:
     return await refresh_login_token(req.refresh_token)
+
+
+@router.post("/google")
+async def google_login(req: GoogleLoginRequest) -> dict:
+    return await begin_google_login(req.credential)
 
 
 @router.get("/me")

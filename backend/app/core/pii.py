@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
 import os
 from functools import lru_cache
 
+from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESSIV
-from sqlalchemy.types import String, TypeDecorator
+from sqlalchemy.types import String, Text, TypeDecorator
 
 
 class PIICodec:
@@ -33,6 +35,9 @@ class PIICodec:
         plaintext = self._cipher.decrypt(payload, [b"customs-brain-pii"])
         return plaintext.decode("utf-8")
 
+    def is_encrypted(self, value: str | None) -> bool:
+        return bool(value and value.startswith(self._prefix))
+
 
 @lru_cache(maxsize=1)
 def get_pii_codec() -> PIICodec:
@@ -40,6 +45,33 @@ def get_pii_codec() -> PIICodec:
     if not secret:
         raise RuntimeError("PII_ENCRYPTION_KEY or SECRET_KEY must be set in the environment.")
     return PIICodec(secret)
+
+
+@lru_cache(maxsize=1)
+def get_legacy_pii_codecs() -> tuple[PIICodec, ...]:
+    raw_value = os.getenv("PII_ENCRYPTION_LEGACY_KEYS", "")
+    secrets = [secret.strip() for secret in raw_value.split(",") if secret.strip()]
+    return tuple(PIICodec(secret) for secret in secrets)
+
+
+def decrypt_pii_value(value: str) -> str:
+    """Decrypt a stored value using the primary key, then any configured legacy keys."""
+
+    if not get_pii_codec().is_encrypted(value):
+        return value
+
+    codecs = (get_pii_codec(), *get_legacy_pii_codecs())
+    last_error: Exception | None = None
+    for codec in codecs:
+        try:
+            return codec.decrypt(value)
+        except InvalidTag as exc:
+            last_error = exc
+            continue
+
+    if last_error is not None:
+        raise last_error
+    return value
 
 
 class EncryptedString(TypeDecorator):
@@ -56,4 +88,29 @@ class EncryptedString(TypeDecorator):
     def process_result_value(self, value: str | None, dialect) -> str | None:  # type: ignore[no-untyped-def]
         if value is None:
             return None
-        return get_pii_codec().decrypt(value)
+        return decrypt_pii_value(value)
+
+
+class EncryptedJSON(TypeDecorator):
+    """SQLAlchemy JSON-like type stored as encrypted text at rest."""
+
+    impl = Text
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):  # type: ignore[no-untyped-def]
+        if value is None:
+            return None
+        if isinstance(value, str) and get_pii_codec().is_encrypted(value):
+            return value
+
+        serialized = json.dumps(value)
+        return get_pii_codec().encrypt(serialized)
+
+    def process_result_value(self, value, dialect):  # type: ignore[no-untyped-def]
+        if value is None:
+            return None
+        if isinstance(value, (dict, list)):
+            return value
+
+        decrypted = decrypt_pii_value(value)
+        return json.loads(decrypted)

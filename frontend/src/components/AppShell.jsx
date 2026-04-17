@@ -1,9 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-import { logout } from "../services/auth";
+import { getAuthUser, logout } from "../services/auth";
 
 export default function AppShell({ title, subtitle, children, showLogout = true }) {
+  const authUser = getAuthUser();
+  const isAdmin = authUser?.role === "admin";
+
   return (
     <div className="app-shell">
       <div className="app-frame">
@@ -20,6 +23,11 @@ export default function AppShell({ title, subtitle, children, showLogout = true 
             <NavLink to="/upload" className={({ isActive }) => `nav-pill${isActive ? " active" : ""}`}>
               New Job
             </NavLink>
+            {isAdmin ? (
+              <NavLink to="/security" className={({ isActive }) => `nav-pill${isActive ? " active" : ""}`}>
+                Security
+              </NavLink>
+            ) : null}
             {showLogout ? (
               <button
                 className="nav-pill"

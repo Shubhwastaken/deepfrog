@@ -1,7 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
-import { beginLogin, isAuthenticated, verifyOtp } from "../services/auth";
+import { beginLogin, getAuthProviders, isAuthenticated, loginWithGoogle, verifyOtp } from "../services/auth";
+
+const GOOGLE_IDENTITY_SCRIPT = "https://accounts.google.com/gsi/client";
+
+const loadGoogleIdentityScript = () => (
+  new Promise((resolve, reject) => {
+    const existingScript = document.querySelector(`script[src="${GOOGLE_IDENTITY_SCRIPT}"]`);
+    if (existingScript) {
+      if (window.google?.accounts?.id) {
+        resolve();
+        return;
+      }
+      existingScript.addEventListener("load", () => resolve(), { once: true });
+      existingScript.addEventListener("error", () => reject(new Error("Failed to load Google Sign-In.")), {
+        once: true,
+      });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = GOOGLE_IDENTITY_SCRIPT;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load Google Sign-In."));
+    document.head.appendChild(script);
+  })
+);
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,12 +38,97 @@ export default function Login() {
   const [error, setError] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [providerConfig, setProviderConfig] = useState(null);
+  const [providerError, setProviderError] = useState("");
+  const googleButtonRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
   if (isAuthenticated()) {
     return <Navigate replace to="/dashboard" />;
   }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProviders = async () => {
+      try {
+        const providers = await getAuthProviders();
+        if (isMounted) {
+          setProviderConfig(providers);
+        }
+      } catch (loadError) {
+        if (isMounted) {
+          setProviderError(loadError?.response?.data?.detail || "Unable to load sign-in providers.");
+        }
+      }
+    };
+
+    loadProviders();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const googleProvider = providerConfig?.google;
+    if (!googleProvider?.enabled || !googleProvider?.client_id || challenge || !googleButtonRef.current) {
+      return undefined;
+    }
+
+    let isCancelled = false;
+
+    const setupGoogleButton = async () => {
+      try {
+        await loadGoogleIdentityScript();
+        if (isCancelled || !window.google?.accounts?.id || !googleButtonRef.current) {
+          return;
+        }
+
+        googleButtonRef.current.innerHTML = "";
+        window.google.accounts.id.initialize({
+          client_id: googleProvider.client_id,
+          callback: async ({ credential }) => {
+            if (!credential) {
+              setError("Google did not return a credential. Please try again.");
+              return;
+            }
+
+            setError("");
+            setInfoMessage("");
+            setIsSubmitting(true);
+            try {
+              await loginWithGoogle(credential);
+              navigate(location.state?.from || "/dashboard", { replace: true });
+            } catch (googleError) {
+              setError(googleError?.response?.data?.detail || "Google Sign-In failed. Please try again.");
+            } finally {
+              setIsSubmitting(false);
+            }
+          },
+        });
+
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+          theme: "outline",
+          size: "large",
+          text: "signin_with",
+          shape: "pill",
+          width: Math.max(280, Math.min(420, googleButtonRef.current.offsetWidth || 360)),
+        });
+      } catch (scriptError) {
+        if (!isCancelled) {
+          setProviderError(scriptError.message);
+        }
+      }
+    };
+
+    setupGoogleButton();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [challenge, location.state, navigate, providerConfig]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -53,6 +165,11 @@ export default function Login() {
             Customs Brain compares multiple HS classification worlds, tests each one for compliance,
             estimates landed cost, and gives your team a report-ready recommendation.
           </p>
+          <div className="login-signal-row">
+            <span className="signal-pill good">Encrypted PII</span>
+            <span className="signal-pill neutral">JWT Sessions</span>
+            <span className="signal-pill warning">2 Worker Pipeline</span>
+          </div>
           <div className="login-stats">
             <div className="login-stat">
               <strong>1. Upload both source documents</strong>
@@ -82,6 +199,22 @@ export default function Login() {
           <p className="muted">
             Passwords are stored as secure hashes, and sign-in completes with a one-time verification code.
           </p>
+          {!challenge && providerConfig?.google?.enabled ? (
+            <div className="login-provider-stack">
+              <div className="google-auth-card">
+                <div>
+                  <strong>Google Sign-In</strong>
+                  <p className="muted" style={{ marginBottom: 0 }}>
+                    Use your verified Google account for direct access, then the app issues its own JWT session.
+                  </p>
+                </div>
+                <div className="google-button-shell" ref={googleButtonRef} />
+              </div>
+              <div className="login-divider">
+                <span>or use password + OTP</span>
+              </div>
+            </div>
+          ) : null}
           <form className="field-grid" onSubmit={handleSubmit}>
             <div className="field">
               <label htmlFor="email">Email</label>
@@ -119,6 +252,7 @@ export default function Login() {
                 />
               </div>
             )}
+            {providerError ? <div className="alert error">{providerError}</div> : null}
             {infoMessage ? <div className="alert info">{infoMessage}</div> : null}
             {challenge?.debug_otp ? (
               <div className="alert info">

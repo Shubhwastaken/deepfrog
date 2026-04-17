@@ -1,13 +1,21 @@
 from __future__ import annotations
 
+import asyncio
+import json
 import smtplib
+import time
 import uuid
 from datetime import datetime, timedelta
 from email.message import EmailMessage
+from secrets import token_urlsafe
 from typing import Callable
+from urllib.error import URLError
+from urllib.request import urlopen
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import jwk, jwt
+from jose.utils import base64url_decode
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +37,9 @@ from shared.utils.logger import get_logger
 
 logger = get_logger("customs_brain.auth")
 bearer_scheme = HTTPBearer(auto_error=False)
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+GOOGLE_JWKS_CACHE_TTL_SECONDS = 3600
+_google_jwks_cache: dict | None = None
 
 
 def _normalize_email(email: str) -> str:
@@ -45,6 +56,16 @@ def _smtp_configured() -> bool:
 
 def get_user_role(user: User) -> str:
     return "admin" if _normalize_email(user.email) == _normalize_email(settings.ADMIN_EMAIL) else "general_user"
+
+
+def get_auth_provider_status() -> dict:
+    return {
+        "password_otp_enabled": True,
+        "google": {
+            "enabled": bool(settings.GOOGLE_CLIENT_ID),
+            "client_id": settings.GOOGLE_CLIENT_ID if settings.GOOGLE_CLIENT_ID else None,
+        },
+    }
 
 
 async def ensure_default_user() -> None:
@@ -100,6 +121,50 @@ async def begin_password_login(email: str, password: str) -> dict:
     if settings.AUTH_DEBUG_OTP_ECHO:
         payload["debug_otp"] = otp_code
     return payload
+
+
+async def begin_google_login(credential: str) -> dict:
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google Sign-In is not configured for this deployment.",
+        )
+
+    google_claims = await _verify_google_id_token(credential)
+    normalized_email = _normalize_email(google_claims["email"])
+    google_subject = google_claims["sub"]
+
+    async with get_session_factory()() as session:
+        user = await _find_user_by_google_subject(session, google_subject)
+        if user is None:
+            user = await _find_user_by_email(session, normalized_email)
+
+        if user is not None:
+            existing_subject = user.google_subject
+            if existing_subject and existing_subject != google_subject:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="This account is already linked to a different Google identity.",
+                )
+            user.google_subject = google_subject
+            if user.email != normalized_email:
+                user.email = normalized_email
+        else:
+            user = User(
+                id=str(uuid.uuid4()),
+                email=normalized_email,
+                password_hash=hash_secret(token_urlsafe(32)),
+                google_subject=google_subject,
+                is_active=True,
+            )
+            session.add(user)
+
+        if not user.is_active:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User account is not available")
+
+        await session.commit()
+
+    return _build_auth_response(user)
 
 
 async def verify_login_otp(challenge_id: str, otp_code: str) -> dict:
@@ -191,6 +256,14 @@ async def _find_user_by_email(session: AsyncSession, email: str) -> User | None:
     return None
 
 
+async def _find_user_by_google_subject(session: AsyncSession, google_subject: str) -> User | None:
+    result = await session.execute(select(User))
+    for user in result.scalars():
+        if user.google_subject == google_subject:
+            return user
+    return None
+
+
 async def _find_user_by_identity(session: AsyncSession, *, user_id: str | None, email: str | None) -> User | None:
     if user_id:
         result = await session.execute(select(User).where(User.id == user_id))
@@ -216,6 +289,7 @@ async def _ensure_user(session: AsyncSession, *, email: str, password: str) -> b
             id=str(uuid.uuid4()),
             email=email,
             password_hash=hash_secret(password),
+            google_subject=None,
             is_active=True,
         )
     )
@@ -266,6 +340,97 @@ async def _send_otp_email(email: str, otp_code: str) -> None:
                 smtp.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
             smtp.send_message(message)
 
-    import asyncio
-
     await asyncio.to_thread(_send)
+
+
+async def _verify_google_id_token(credential: str) -> dict:
+    try:
+        header = jwt.get_unverified_header(credential)
+        claims = jwt.get_unverified_claims(credential)
+    except JWTError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google credential") from exc
+
+    key_id = header.get("kid")
+    if not key_id:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google credential is missing a key id")
+
+    jwks = await _get_google_jwks()
+    matching_key = next((key for key in jwks.get("keys", []) if key.get("kid") == key_id), None)
+    if matching_key is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unknown Google signing key")
+
+    try:
+        encoded_header, encoded_payload, encoded_signature = credential.split(".")
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google credential") from exc
+    signing_input = f"{encoded_header}.{encoded_payload}".encode("utf-8")
+    decoded_signature = base64url_decode(encoded_signature.encode("utf-8"))
+    public_key = jwk.construct(matching_key, algorithm=header.get("alg"))
+    if not public_key.verify(signing_input, decoded_signature):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google signature")
+
+    if claims.get("iss") not in {"accounts.google.com", "https://accounts.google.com"}:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google issuer")
+
+    audience = claims.get("aud")
+    if isinstance(audience, list):
+        audience_match = settings.GOOGLE_CLIENT_ID in audience
+    else:
+        audience_match = audience == settings.GOOGLE_CLIENT_ID
+    if not audience_match:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google audience mismatch")
+
+    expiry = claims.get("exp")
+    if not isinstance(expiry, (int, float)) or expiry < time.time():
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google credential has expired")
+
+    if claims.get("email_verified") is not True:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google email is not verified")
+
+    email = claims.get("email")
+    subject = claims.get("sub")
+    if not email or not subject:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Google credential is incomplete")
+
+    if settings.GOOGLE_ALLOWED_DOMAIN:
+        hosted_domain = str(claims.get("hd") or "").lower()
+        if hosted_domain != settings.GOOGLE_ALLOWED_DOMAIN:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Google account is outside the allowed hosted domain.",
+            )
+
+    return claims
+
+
+async def _get_google_jwks() -> dict:
+    global _google_jwks_cache
+
+    if _google_jwks_cache and (_google_jwks_cache["fetched_at"] + GOOGLE_JWKS_CACHE_TTL_SECONDS) > time.time():
+        return _google_jwks_cache["payload"]
+
+    discovery_document = await asyncio.to_thread(_fetch_json, GOOGLE_DISCOVERY_URL)
+    jwks_uri = discovery_document.get("jwks_uri")
+    if not jwks_uri:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google discovery document did not include a JWKS URI.",
+        )
+
+    jwks = await asyncio.to_thread(_fetch_json, jwks_uri)
+    _google_jwks_cache = {
+        "fetched_at": time.time(),
+        "payload": jwks,
+    }
+    return jwks
+
+
+def _fetch_json(url: str) -> dict:
+    try:
+        with urlopen(url, timeout=15) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except (OSError, URLError, TimeoutError, json.JSONDecodeError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Unable to reach Google Sign-In services right now.",
+        ) from exc

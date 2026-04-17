@@ -29,6 +29,17 @@ export const beginLogin = async (email, password) => {
   return res.data;
 };
 
+export const getAuthProviders = async () => {
+  const res = await axios.get(`${API_BASE}/api/auth/providers`);
+  return res.data;
+};
+
+export const loginWithGoogle = async (credential) => {
+  const res = await axios.post(`${API_BASE}/api/auth/google`, { credential });
+  setSession(res.data);
+  return res.data;
+};
+
 export const verifyOtp = async (challengeId, otpCode) => {
   const res = await axios.post(`${API_BASE}/api/auth/verify-otp`, {
     challenge_id: challengeId,

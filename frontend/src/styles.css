@@ -892,6 +892,55 @@ th {
   border: 1px solid rgba(20, 33, 61, 0.08);
 }
 
+.security-metrics {
+  margin-top: 18px;
+}
+
+.db-proof-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.db-proof-item {
+  padding: 18px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(179, 92, 46, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(20, 33, 61, 0.08);
+}
+
+.db-proof-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.db-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.db-proof-span-two {
+  grid-column: 1 / -1;
+}
+
+.db-proof-code {
+  display: block;
+  margin-top: 6px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(20, 33, 61, 0.06);
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  color: var(--ink);
+  font-family: "Consolas", "Courier New", monospace;
+  overflow-wrap: anywhere;
+}
+
 .spinner {
   width: 42px;
   height: 42px;
@@ -935,11 +984,57 @@ th {
   margin-top: 30px;
 }
 
+.login-signal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
 .login-stat {
   padding: 18px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.login-provider-stack {
+  display: grid;
+  gap: 16px;
+  margin: 26px 0 10px;
+}
+
+.google-auth-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(47, 125, 74, 0.08), transparent 32%),
+    rgba(255, 255, 255, 0.78);
+}
+
+.google-button-shell {
+  min-height: 46px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(20, 33, 61, 0.1);
 }
 
 .code {
@@ -964,7 +1059,8 @@ th {
   .scenario-grid,
   .leader-metrics,
   .delta-grid,
-  .inspector-grid {
+  .inspector-grid,
+  .db-proof-grid {
     grid-template-columns: 1fr;
   }
 

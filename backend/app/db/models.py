@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, JSON, String, Text
+from sqlalchemy import Boolean, Column, DateTime, String, Text
 from sqlalchemy.orm import declarative_base
-from app.core.pii import EncryptedString
+from app.core.pii import EncryptedJSON, EncryptedString
 
 Base = declarative_base()
 
@@ -13,6 +13,7 @@ class User(Base):
     id = Column(String, primary_key=True)
     email = Column(EncryptedString(512), unique=True, nullable=False, index=True)
     password_hash = Column(String, nullable=False)
+    google_subject = Column(EncryptedString(512), nullable=True, index=True)
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -38,7 +39,7 @@ class Job(Base):
     invoice_path = Column(EncryptedString(1024), nullable=False)
     bill_of_lading_path = Column(EncryptedString(1024), nullable=False)
     status = Column(String, default="queued")
-    results = Column(JSON, nullable=True)
-    report_path = Column(String, nullable=True)
+    results = Column(EncryptedJSON(), nullable=True)
+    report_path = Column(EncryptedString(1024), nullable=True)
     error_message = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

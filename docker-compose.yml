@@ -48,7 +48,7 @@ services:
       REPORT_DIR: /app/data/reports
       LOG_DIR: /app/data/logs
       SERVICE_NAME: backend
-      PYTHONPATH: /app
+      PYTHONPATH: /app:/app/backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -82,7 +82,7 @@ services:
       LOG_DIR: /app/data/logs
       SERVICE_NAME: worker-a
       WORKER_NAME: worker-a
-      PYTHONPATH: /app
+      PYTHONPATH: /app:/app/backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -111,7 +111,7 @@ services:
       LOG_DIR: /app/data/logs
       SERVICE_NAME: worker-b
       WORKER_NAME: worker-b
-      PYTHONPATH: /app
+      PYTHONPATH: /app:/app/backend
     depends_on:
       postgres:
         condition: service_healthy

@@ -81,6 +81,11 @@ export async function getPipelineMetrics() {
   return response.data;
 }
 
+export async function getSecurityStorageProof() {
+  const response = await api.get("/api/security/storage");
+  return response.data;
+}
+
 export async function downloadReport(jobId) {
   const response = await api.get(`/api/results/${jobId}/report`, { responseType: "blob" });
   return response.data;

@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
-import json
 import os
+import sys
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import text, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+BACKEND_ROOT = Path(__file__).resolve().parents[1] / "backend"
+if str(BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACKEND_ROOT))
+
+from app.db.models import Job
 
 
 @lru_cache(maxsize=1)
@@ -40,22 +47,19 @@ async def update_job_processing(job_id: str) -> None:
 async def update_job_completed(job_id: str, payload: dict[str, Any]) -> None:
     """Persist the final pipeline output for a completed job."""
 
-    await _execute_update(
-        """
-        UPDATE jobs
-        SET status = :status,
-            results = CAST(:results AS JSON),
-            report_path = :report_path,
-            error_message = NULL
-        WHERE id = :job_id
-        """,
-        {
-            "job_id": job_id,
-            "status": "completed",
-            "results": json.dumps(payload["output_result"]),
-            "report_path": payload.get("report_path"),
-        },
-    )
+    session_factory = get_session_factory()
+    async with session_factory() as session:
+        await session.execute(
+            update(Job)
+            .where(Job.id == job_id)
+            .values(
+                status="completed",
+                results=payload["output_result"],
+                report_path=payload.get("report_path"),
+                error_message=None,
+            )
+        )
+        await session.commit()
 
 
 async def update_job_failed(job_id: str, error_message: str) -> None:

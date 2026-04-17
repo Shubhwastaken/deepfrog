@@ -11,6 +11,7 @@ Trade teams usually make customs decisions with incomplete context spread across
 This project turns one shipment into multiple classification worlds, evaluates each world for compliance, valuation, duty impact, and critic risk, then ranks the options and publishes a report-ready result. The platform includes:
 
 - password login plus OTP-based MFA
+- optional Google Sign-In using Google Identity Services ID tokens
 - JWT access and refresh tokens
 - admin versus general-user RBAC
 - encrypted PII at rest for user emails and job document paths
@@ -34,7 +35,8 @@ This project turns one shipment into multiple classification worlds, evaluates e
 2. Set `OPENAI_API_KEY`, `SECRET_KEY`, and `PII_ENCRYPTION_KEY`.
 3. Optionally set `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 4. Optionally set `GENERAL_USER_EMAIL` and `GENERAL_USER_PASSWORD` to seed a non-admin user.
-5. Start the stack:
+5. To enable Google Sign-In, set `GOOGLE_CLIENT_ID` and optionally `GOOGLE_ALLOWED_DOMAIN`.
+6. Start the stack:
 
 ```bash
 docker compose up --build
