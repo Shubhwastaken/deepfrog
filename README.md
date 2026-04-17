@@ -83,23 +83,27 @@ At a glance, this project is both:
 
 ## Representative Screens
 
-The repository did not previously contain checked-in screenshots, so the README now includes repo-owned representative UI captures that mirror the current product layout and flow.
+This README now uses real product screenshots captured from the running application.
 
-### Login
+### Upload Flow
 
-![Login Screen](docs/assets/screens/login-screen.svg)
+![Upload Page](docs/assets/screenshots/upload-page.png)
 
-### Dashboard
+### Dashboard And Worker Fleet
 
-![Dashboard Screen](docs/assets/screens/dashboard-screen.svg)
+![Dashboard Worker Fleet](docs/assets/screenshots/dashboard-workers.png)
 
-### Results
+### Results Summary And Scenario Lab
 
-![Results Screen](docs/assets/screens/results-screen.svg)
+![Results Summary And Scenario Lab](docs/assets/screenshots/results-summary-scenario-lab.png)
+
+### Rival Inspector And World Evidence
+
+![Results Rival Inspector](docs/assets/screenshots/results-rival-inspector.png)
 
 ### Security Proof
 
-![Security Screen](docs/assets/screens/security-screen.svg)
+![Security Proof](docs/assets/screenshots/security-proof.png)
 
 ---
 
