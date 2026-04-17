@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-labelledby="title desc">
+  <title id="title">Customs Brain login screen</title>
+  <desc id="desc">Representative login screen with Google Sign-In and password plus OTP entry.</desc>
+  <rect width="1600" height="920" fill="#f4efe4"/>
+  <circle cx="170" cy="110" r="180" fill="#f7d9c9" opacity="0.55"/>
+  <circle cx="1460" cy="140" r="200" fill="#d9e1ef" opacity="0.55"/>
+  <rect x="110" y="95" width="1380" height="730" rx="34" fill="#fffaf2" stroke="#e5dccf"/>
+  <rect x="110" y="95" width="790" height="730" rx="34" fill="#16233f"/>
+  <circle cx="760" cy="195" r="140" fill="#b35c2e" opacity="0.22"/>
+  <text x="170" y="160" fill="#f2d6c6" font-size="20" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">AGENTIC CUSTOMS INTELLIGENCE</text>
+  <text x="170" y="235" fill="#ffffff" font-size="64" font-family="Georgia, serif" font-weight="700">Choose the safest</text>
+  <text x="170" y="305" fill="#ffffff" font-size="64" font-family="Georgia, serif" font-weight="700">world before customs does.</text>
+  <text x="170" y="368" fill="#d7deec" font-size="26" font-family="Segoe UI, Arial, sans-serif">Representative login surface with Google Sign-In,</text>
+  <text x="170" y="404" fill="#d7deec" font-size="26" font-family="Segoe UI, Arial, sans-serif">password + OTP MFA, JWT sessions, and upload flow context.</text>
+  <rect x="170" y="454" width="180" height="42" rx="21" fill="#284f3b"/>
+  <text x="214" y="482" fill="#dcf5e5" font-size="20" font-family="Segoe UI, Arial, sans-serif">Encrypted PII</text>
+  <rect x="366" y="454" width="160" height="42" rx="21" fill="#253756"/>
+  <text x="410" y="482" fill="#d7deec" font-size="20" font-family="Segoe UI, Arial, sans-serif">JWT Sessions</text>
+  <rect x="542" y="454" width="180" height="42" rx="21" fill="#5d4d20"/>
+  <text x="582" y="482" fill="#fff2be" font-size="20" font-family="Segoe UI, Arial, sans-serif">2 Worker Queue</text>
+  <rect x="170" y="540" width="640" height="92" rx="22" fill="#23324f" stroke="#3a4d74"/>
+  <text x="208" y="585" fill="#ffffff" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">1. Upload both source documents</text>
+  <text x="208" y="620" fill="#d7deec" font-size="22" font-family="Segoe UI, Arial, sans-serif">Invoice and bill of lading are processed together for one customs job.</text>
+  <rect x="170" y="650" width="640" height="92" rx="22" fill="#23324f" stroke="#3a4d74"/>
+  <text x="208" y="695" fill="#ffffff" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">2. Compare alternative worlds</text>
+  <text x="208" y="730" fill="#d7deec" font-size="22" font-family="Segoe UI, Arial, sans-serif">Each world is scored for duty, compliance, risk, and confidence.</text>
+  <text x="960" y="160" fill="#8d3f18" font-size="20" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">SECURE ENTRY</text>
+  <text x="960" y="230" fill="#14213d" font-size="56" font-family="Georgia, serif" font-weight="700">Sign in to review jobs</text>
+  <text x="960" y="286" fill="#4f5d75" font-size="24" font-family="Segoe UI, Arial, sans-serif">Passwords stay hashed, OTP completes password auth,</text>
+  <text x="960" y="320" fill="#4f5d75" font-size="24" font-family="Segoe UI, Arial, sans-serif">and Google Sign-In can issue the same app JWT session.</text>
+  <rect x="960" y="370" width="480" height="126" rx="24" fill="#ffffff" stroke="#d8d0c4"/>
+  <text x="1000" y="420" fill="#14213d" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Google Sign-In</text>
+  <text x="1000" y="455" fill="#4f5d75" font-size="22" font-family="Segoe UI, Arial, sans-serif">Verified Google identity token -> backend verification -> JWT session</text>
+  <rect x="1000" y="468" width="250" height="18" rx="9" fill="#f0f4fa"/>
+  <rect x="1160" y="520" width="220" height="56" rx="28" fill="#ffffff" stroke="#c6d0df" stroke-width="2"/>
+  <circle cx="1196" cy="548" r="15" fill="#ffffff" stroke="#d0d7e5"/>
+  <path d="M1196 533a15 15 0 0 1 11 5l-6 5a7 7 0 0 0-5-2 7 7 0 0 0-6 4l-7-5a15 15 0 0 1 13-7z" fill="#4285F4"/>
+  <path d="M1211 548c0 9-6 15-15 15a15 15 0 0 1-13-7l7-5a8 8 0 0 0 6 4c4 0 7-2 8-6h-8v-8h16a15 15 0 0 1 1 7z" fill="#34A853"/>
+  <path d="M1183 556a15 15 0 0 1 0-16l7 5a8 8 0 0 0 0 6z" fill="#FBBC05"/>
+  <path d="M1183 540l7 5a8 8 0 0 1 6-4 8 8 0 0 1 5 2l6-5a15 15 0 0 0-24 2z" fill="#EA4335"/>
+  <text x="1230" y="556" fill="#14213d" font-size="24" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Sign in with Google</text>
+  <text x="1176" y="632" fill="#8d99af" font-size="18" font-family="Segoe UI, Arial, sans-serif" letter-spacing="3">OR USE PASSWORD + OTP</text>
+  <line x1="960" y1="625" x2="1145" y2="625" stroke="#d6dce6"/>
+  <line x1="1384" y1="625" x2="1440" y2="625" stroke="#d6dce6"/>
+  <text x="960" y="690" fill="#4f5d75" font-size="18" font-family="Segoe UI, Arial, sans-serif" font-weight="700">EMAIL</text>
+  <rect x="960" y="704" width="480" height="62" rx="16" fill="#ffffff" stroke="#d8d0c4"/>
+  <text x="990" y="744" fill="#9aa5b6" font-size="22" font-family="Segoe UI, Arial, sans-serif">you@company.com</text>
+  <text x="960" y="812" fill="#4f5d75" font-size="18" font-family="Segoe UI, Arial, sans-serif" font-weight="700">PASSWORD OR OTP</text>
+  <rect x="960" y="826" width="300" height="0" fill="none"/>
+  <rect x="960" y="826" width="480" height="62" rx="16" fill="#ffffff" stroke="#d8d0c4"/>
+  <text x="990" y="866" fill="#9aa5b6" font-size="22" font-family="Segoe UI, Arial, sans-serif">Current password or 6-digit OTP</text>
+  <rect x="1240" y="770" width="200" height="52" rx="26" fill="#b35c2e"/>
+  <text x="1296" y="803" fill="#ffffff" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700">Send OTP</text>
+</svg>

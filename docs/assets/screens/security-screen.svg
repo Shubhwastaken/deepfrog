@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-labelledby="title desc">
+  <title id="title">Customs Brain security proof screen</title>
+  <desc id="desc">Representative admin-only storage proof page showing encrypted user and job data samples.</desc>
+  <rect width="1600" height="920" fill="#f4efe4"/>
+  <circle cx="190" cy="110" r="170" fill="#f7d9c9" opacity="0.45"/>
+  <circle cx="1420" cy="120" r="190" fill="#d9e1ef" opacity="0.45"/>
+  <text x="110" y="80" fill="#8d3f18" font-size="18" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">CUSTOMS BRAIN</text>
+  <text x="110" y="144" fill="#14213d" font-size="58" font-family="Georgia, serif" font-weight="700">Security Proof</text>
+  <text x="110" y="186" fill="#4f5d75" font-size="24" font-family="Segoe UI, Arial, sans-serif">Admin-only proof page that reads raw encrypted PostgreSQL values for judges and auditors.</text>
+  <rect x="110" y="228" width="1380" height="112" rx="28" fill="#fffaf2" stroke="#e3dacd"/>
+  <rect x="150" y="262" width="170" height="40" rx="20" fill="#284f3b"/>
+  <text x="182" y="289" fill="#dcf5e5" font-size="20" font-family="Segoe UI, Arial, sans-serif">Encrypted At Rest</text>
+  <rect x="336" y="262" width="170" height="40" rx="20" fill="#253756"/>
+  <text x="372" y="289" fill="#d7deec" font-size="20" font-family="Segoe UI, Arial, sans-serif">Prefix enc::</text>
+  <rect x="522" y="262" width="190" height="40" rx="20" fill="#5d4d20"/>
+  <text x="556" y="289" fill="#fff2be" font-size="20" font-family="Segoe UI, Arial, sans-serif">Passwords hashed</text>
+  <text x="150" y="322" fill="#4f5d75" font-size="22" font-family="Segoe UI, Arial, sans-serif">This page proves the browser never sees plaintext values from the raw database tables.</text>
+  <rect x="110" y="378" width="670" height="442" rx="28" fill="#fffaf2" stroke="#e3dacd"/>
+  <text x="150" y="418" fill="#8d3f18" font-size="18" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">USERS TABLE</text>
+  <text x="150" y="460" fill="#14213d" font-size="40" font-family="Georgia, serif" font-weight="700">User storage proof</text>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <rect x="150" y="492" width="130" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="178" y="522" fill="#7b8798" font-size="16">TOTAL USERS</text>
+    <text x="188" y="560" fill="#14213d" font-size="34" font-weight="700">3</text>
+    <rect x="296" y="492" width="150" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="320" y="522" fill="#7b8798" font-size="16">ENCRYPTED EMAILS</text>
+    <text x="352" y="560" fill="#14213d" font-size="34" font-weight="700">3</text>
+    <rect x="462" y="492" width="170" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="484" y="522" fill="#7b8798" font-size="16">ENCRYPTED GOOGLE IDS</text>
+    <text x="534" y="560" fill="#14213d" font-size="34" font-weight="700">1</text>
+  </g>
+  <rect x="150" y="606" width="590" height="176" rx="22" fill="#ffffff" stroke="#ddd6ca"/>
+  <text x="182" y="642" fill="#14213d" font-size="24" font-family="Segoe UI, Arial, sans-serif" font-weight="700">user-1</text>
+  <rect x="620" y="622" width="90" height="34" rx="17" fill="#dcf5e5"/>
+  <text x="642" y="645" fill="#284f3b" font-size="18" font-family="Segoe UI, Arial, sans-serif">encrypted</text>
+  <text x="182" y="688" fill="#7b8798" font-size="16" font-family="Segoe UI, Arial, sans-serif">EMAIL PREFIX</text>
+  <rect x="182" y="696" width="240" height="42" rx="14" fill="#eef1f5"/>
+  <text x="202" y="723" fill="#14213d" font-size="18" font-family="Consolas, monospace">enc::2sd8HfKa... </text>
+  <text x="448" y="688" fill="#7b8798" font-size="16" font-family="Segoe UI, Arial, sans-serif">GOOGLE SUBJECT PREFIX</text>
+  <rect x="448" y="696" width="240" height="42" rx="14" fill="#eef1f5"/>
+  <text x="468" y="723" fill="#14213d" font-size="18" font-family="Consolas, monospace">enc::Y29vZ2xl... </text>
+  <rect x="820" y="378" width="670" height="442" rx="28" fill="#fffaf2" stroke="#e3dacd"/>
+  <text x="860" y="418" fill="#8d3f18" font-size="18" font-family="Segoe UI, Arial, sans-serif" letter-spacing="4">JOBS TABLE</text>
+  <text x="860" y="460" fill="#14213d" font-size="40" font-family="Georgia, serif" font-weight="700">Pipeline storage proof</text>
+  <g font-family="Segoe UI, Arial, sans-serif">
+    <rect x="860" y="492" width="128" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="886" y="522" fill="#7b8798" font-size="16">TOTAL JOBS</text>
+    <text x="906" y="560" fill="#14213d" font-size="34" font-weight="700">8</text>
+    <rect x="1004" y="492" width="146" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="1028" y="522" fill="#7b8798" font-size="16">OWNER EMAILS</text>
+    <text x="1064" y="560" fill="#14213d" font-size="34" font-weight="700">8</text>
+    <rect x="1166" y="492" width="136" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="1200" y="522" fill="#7b8798" font-size="16">DOC PATHS</text>
+    <text x="1218" y="560" fill="#14213d" font-size="34" font-weight="700">8</text>
+    <rect x="1318" y="492" width="136" height="84" rx="18" fill="#ffffff" stroke="#ddd6ca"/>
+    <text x="1342" y="522" fill="#7b8798" font-size="16">RESULTS BLOB</text>
+    <text x="1374" y="560" fill="#14213d" font-size="34" font-weight="700">8</text>
+  </g>
+  <rect x="860" y="606" width="590" height="176" rx="22" fill="#ffffff" stroke="#ddd6ca"/>
+  <text x="892" y="642" fill="#14213d" font-size="24" font-family="Segoe UI, Arial, sans-serif" font-weight="700">job-1</text>
+  <rect x="1334" y="622" width="90" height="34" rx="17" fill="#dcf5e5"/>
+  <text x="1356" y="645" fill="#284f3b" font-size="18" font-family="Segoe UI, Arial, sans-serif">encrypted</text>
+  <text x="892" y="688" fill="#7b8798" font-size="16" font-family="Segoe UI, Arial, sans-serif">OWNER EMAIL PREFIX</text>
+  <rect x="892" y="696" width="220" height="42" rx="14" fill="#eef1f5"/>
+  <text x="910" y="723" fill="#14213d" font-size="18" font-family="Consolas, monospace">enc::D0k9xa... </text>
+  <text x="1132" y="688" fill="#7b8798" font-size="16" font-family="Segoe UI, Arial, sans-serif">RESULTS PREFIX</text>
+  <rect x="1132" y="696" width="290" height="42" rx="14" fill="#eef1f5"/>
+  <text x="1150" y="723" fill="#14213d" font-size="18" font-family="Consolas, monospace">enc::Lm91dHB1dF9yZXN1bHQ... </text>
+</svg>
